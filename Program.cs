@@ -776,7 +776,7 @@
             {
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine(@"
+                Console.WriteLine(@" 
      ,-.      .             .         .     .                                           
     (   `     | o           |         |     |                                           
      `-.  ,-: | . ,-. ;-. ,-| ,-.   ,-| ,-. |   ;-. ;-. ,-. ,-: ;-. ,-: ;-.-. ,-:       
