@@ -18,7 +18,6 @@
         {
             int contador = 0;
             Huesped[] huespedes = new Huesped[100];
-            char continuar = 's'; // Variable char para control
             bool aplicacionActiva = true; // Variable bool
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -180,19 +179,21 @@
 
         public struct Huesped
         {
-            // camelCase correcto para las propiedades
-            public int id;
+            
+            public int dni;
             public string nombre;
+            public int numeroHuespedes;
             public int numeroHabitacion;
             public string claseHabitacion;
             public int nochesEstadia;
             public string metodoPago;
             public decimal precioTotal;
 
-            public Huesped(int id, string nombre, int numeroHabitacion, string claseHabitacion, int nochesEstadia, string metodoPago, decimal precioTotal)
+            public Huesped(int dni, string nombre, int numeroHuespedes, int numeroHabitacion, string claseHabitacion, int nochesEstadia, string metodoPago, decimal precioTotal)
             {
-                this.id = id;
+                this.dni = dni;
                 this.nombre = nombre;
+                this.numeroHuespedes = numeroHuespedes;
                 this.numeroHabitacion = numeroHabitacion;
                 this.claseHabitacion = claseHabitacion;
                 this.nochesEstadia = nochesEstadia;
@@ -203,8 +204,9 @@
             public void MostrarInfo()
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"ID: {id}");
+                Console.WriteLine($"DNI: {dni}");
                 Console.WriteLine($"Nombre: {nombre}");
+                Console.WriteLine($"Números de huespedes: {numeroHuespedes}");
                 Console.WriteLine($"Habitación: {numeroHabitacion}");
                 Console.WriteLine($"Clase de habitación: {claseHabitacion}");
                 Console.WriteLine($"Noches de estadía: {nochesEstadia}");
@@ -221,17 +223,50 @@
             {
                 Console.WriteLine("=== AGREGAR NUEVO CLIENTE ===\n");
 
-                Console.Write("ID: ");
-                if (!int.TryParse(Console.ReadLine(), out int id))
+                Console.Write("DNI: ");
+                if (!int.TryParse(Console.ReadLine(), out int dni))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("ID inválido.");
+                    Console.WriteLine("DNI inválido.");
                     Console.ResetColor();
                     return contador;
                 }
 
                 Console.Write("Nombre: ");
                 string nombre = Console.ReadLine();
+
+                Console.WriteLine("Números de huespedes: (máximo 4)");
+                if (!int.TryParse(Console.ReadLine(), out int numeroHuespedes) || numeroHuespedes < 1 || numeroHuespedes > 4)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Cantidad inválida. Máximo 4 personas.");
+                    Console.ResetColor();
+                    return contador;
+                }
+                Console.Write("¿Cuántos son mayores de edad?: ");
+                if (!int.TryParse(Console.ReadLine(), out int cantidadMayores) || cantidadMayores < 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Cantidad inválida.");
+                    Console.ResetColor();
+                    return contador;
+                }
+
+                Console.Write("¿Cuántos son menores de edad?: ");
+                if (!int.TryParse(Console.ReadLine(), out int cantidadMenores) || cantidadMenores < 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Cantidad inválida.");
+                    Console.ResetColor();
+                    return contador;
+                }
+                if (cantidadMayores + cantidadMenores != numeroHuespedes)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("La suma de mayores y menores no coincide con el total de personas.");
+                    Console.ResetColor();
+                    return contador;
+                }
 
                 Console.Write("Número de habitación (1-20): ");
                 if (!int.TryParse(Console.ReadLine(), out int numeroHabitacion) || numeroHabitacion < 1 || numeroHabitacion > 20)
@@ -290,13 +325,50 @@
                     Console.ResetColor();
                     return contador;
                 }
+                decimal precioTotal = precioBase * nochesEstadia; 
 
-                Console.Write("Método de pago: ");
-                string metodoPago = Console.ReadLine();
+                Console.WriteLine("\nMétodo de pago: ");
+                Console.WriteLine("1. Efectivo");
+                Console.WriteLine("2. Tarjeta de debito");
+                Console.WriteLine("3. Tarjeta de crédito");
+                Console.WriteLine("4. Transferencia");
+                Console.Write("Seleccione el tipo: ");
 
-                decimal precioTotal = precioBase * nochesEstadia;
+                string metodoPago = "";
 
-                huespedes[contador] = new Huesped(id, nombre, numeroHabitacion, claseHabitacion, nochesEstadia, metodoPago, precioTotal);
+
+                if (int.TryParse(Console.ReadLine(), out int metPago))
+                {
+                    switch (metPago)
+                    {
+                        case 1:
+                            metodoPago = "Efectivo";
+                            break;
+                        case 2:
+                            metodoPago = "Tarjeta de débito";
+                            break;
+                        case 3:
+                            metodoPago = "Tarjeta de crédito";
+                            break;
+                        case 4:
+                            metodoPago = "Transferencia";
+                            break;
+                        default:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Tipo inválido.");
+                            Console.ResetColor();
+                            return contador;
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Entrada inválida.");
+                    Console.ResetColor();
+                    return contador;
+                }
+
+                huespedes[contador] = new Huesped(dni, nombre, numeroHuespedes, numeroHabitacion, claseHabitacion, nochesEstadia, metodoPago, precioTotal);
                 contador++;
 
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -339,7 +411,7 @@
             {
                 for (int j = 0; j < contador - i - 1; j++)
                 {
-                    if (huespedesCopia[j].id > huespedesCopia[j + 1].id)
+                    if (huespedesCopia[j].dni > huespedesCopia[j + 1].dni)
                     {
                         Huesped temp = huespedesCopia[j];
                         huespedesCopia[j] = huespedesCopia[j + 1];
@@ -349,11 +421,11 @@
             }
 
             Console.WriteLine("=== ELIMINAR CLIENTE ===\n");
-            Console.Write("Ingrese el ID del huésped a eliminar: ");
+            Console.Write("Ingrese el DNI del huésped a eliminar: ");
             if (!int.TryParse(Console.ReadLine(), out int eliminarId))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("ID inválido.");
+                Console.WriteLine("DNI inválido.");
                 Console.ResetColor();
                 return contador;
             }
@@ -367,12 +439,12 @@
             {
                 int medio = (inicio + fin) / 2;
 
-                if (huespedesCopia[medio].id == eliminarId)
+                if (huespedesCopia[medio].dni == eliminarId)
                 {
                     encontrado = true;
                     indice = medio;
                 }
-                else if (huespedesCopia[medio].id < eliminarId)
+                else if (huespedesCopia[medio].dni < eliminarId)
                 {
                     inicio = medio + 1;
                 }
@@ -394,7 +466,7 @@
             int indiceReal = -1;
             for (int i = 0; i < contador; i++)
             {
-                if (huespedes[i].id == huespedesCopia[indice].id)
+                if (huespedes[i].dni == huespedesCopia[indice].dni)
                 {
                     indiceReal = i;
                     break;
@@ -466,12 +538,12 @@
             }
 
             Console.WriteLine("=== MODIFICAR CLIENTE ===\n");
-            Console.Write("Ingrese el ID del huésped a modificar: ");
+            Console.Write("Ingrese el DNI del huésped a modificar: ");
 
             if (!int.TryParse(Console.ReadLine(), out int idBusqueda))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("ID inválido.");
+                Console.WriteLine("DNI inválido.");
                 Console.ResetColor();
                 return;
             }
@@ -479,7 +551,7 @@
             int indice = -1;
             for (int i = 0; i < contador; i++)
             {
-                if (huespedes[i].id == idBusqueda)
+                if (huespedes[i].dni == idBusqueda)
                 {
                     indice = i;
                     break;
@@ -496,9 +568,10 @@
 
             Console.WriteLine("\n¿Qué desea modificar?");
             Console.WriteLine("1. Nombre");
-            Console.WriteLine("2. Número de habitación");
-            Console.WriteLine("3. Noches de estadía");
-            Console.WriteLine("4. Método de pago");
+            Console.WriteLine("2. Cantidad de huespedes");
+            Console.WriteLine("3. Número de habitación");
+            Console.WriteLine("4. Noches de estadía");
+            Console.WriteLine("5. Método de pago");
             Console.Write("Seleccione: ");
 
             if (int.TryParse(Console.ReadLine(), out int opcionModificar))
@@ -513,7 +586,50 @@
                         Console.ResetColor();
                         break;
 
-                    case 2:
+                   case 2:
+                        Console.Write("¿Cuántas personas van a hospedarse? (máximo 4): ");
+                        if (!int.TryParse(Console.ReadLine(), out int nuevoNumeroHuespedes) || nuevoNumeroHuespedes < 1 || nuevoNumeroHuespedes > 4)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Cantidad inválida. Máximo 4 personas.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        Console.Write("¿Cuántos son mayores de edad?: ");
+                        if (!int.TryParse(Console.ReadLine(), out int nuevoMayores) || nuevoMayores < 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Cantidad inválida.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        Console.Write("¿Cuántos son menores de edad?: ");
+                        if (!int.TryParse(Console.ReadLine(), out int nuevoMenores) || nuevoMenores < 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Cantidad inválida.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        if (nuevoMayores + nuevoMenores != nuevoNumeroHuespedes)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("La suma de mayores y menores no coincide con el total de personas.");
+                            Console.ResetColor();
+                            break;
+                        }
+
+                        huespedes[indice].numeroHuespedes = nuevoNumeroHuespedes;
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"Huéspedes modificados: {nuevoNumeroHuespedes} (Mayores: {nuevoMayores}, Menores: {nuevoMenores})");
+                        Console.ResetColor();
+                        break;
+
+                    case 3:
                         Console.Write("Nuevo número de habitación (1-20): ");
                         if (int.TryParse(Console.ReadLine(), out int nuevoNumero) && nuevoNumero > 0 && nuevoNumero <= 20)
                         {
@@ -564,7 +680,7 @@
                         }
                         break;
 
-                    case 3:
+                    case 4:
                         Console.Write("Nuevas noches: ");
                         if (int.TryParse(Console.ReadLine(), out int nuevasNoches) && nuevasNoches > 0)
                         {
@@ -583,7 +699,7 @@
                         }
                         break;
 
-                    case 4:
+                    case 5:
                         Console.Write("Nuevo método de pago: ");
                         huespedes[indice].metodoPago = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Green;
