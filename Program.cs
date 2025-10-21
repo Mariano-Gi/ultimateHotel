@@ -206,7 +206,7 @@ namespace ultimateHotel
             for (int i = 0; i <= total; i++)
             {
                 int porcentaje = (i * 100) / total;
-                string barra = new string('#', i) + new string('-', total - i);
+                string barra = new string('█', i) + new string('░', total - i);
                 Console.Write($"\r[{barra}] {porcentaje}%");
                 Thread.Sleep(15);
             }
